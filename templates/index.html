@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Genius</title>
+</head>
+<body>
+    <h1>OpenAI Genius</h1>
+    <div>
+        <p>Say "Genius" to start recording your question.</p>
+        <button id="start-btn">Start Recording</button>
+    </div>
+    <div id="response"></div>
+    
+    <script>
+        const startBtn = document.getElementById('start-btn');
+        const responseDiv = document.getElementById('response');
+        
+        function sendRequest(data) {
+            fetch('/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.response);
+                responseDiv.innerHTML = `<p>Subrato says: ${data.response}</p>`;
+            });
+        }
+        
+        function transcribeAudio() {
+            const recognition = new window.webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.start();
+            recognition.onresult = event => {
+                const text = event.results[0][0].transcript.trim();
+                console.log(text);
+                sendRequest({question: text});
+            }
+        }
+        
+        startBtn.addEventListener('click', () => {
+            transcribeAudio();
+        });
+    </script>
+</body>
+</html>
+
+
